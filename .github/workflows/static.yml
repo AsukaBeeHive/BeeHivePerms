@@ -63,7 +63,7 @@ jobs:
           # jqで文字列として渡す
           jq -n \
             --arg content "✅ perms_list.jsonが正常に更新されました
-           🔗 https://asukabeehive.github.io/BeeHivePerms/perms_list.json" \
+          🔗 https://asukabeehive.github.io/BeeHivePerms/perms_list.json" \
             --arg diff "$DIFF" \
             '{
               username: "GitHub Actions",
