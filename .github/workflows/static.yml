@@ -67,7 +67,7 @@ jobs:
                 }
               ]
             }' > payload.json
-          
+
           curl -H "Content-Type: application/json" \
                -X POST \
                -d @payload.json \
