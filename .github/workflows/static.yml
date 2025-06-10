@@ -41,15 +41,32 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Get git diff
+        id: git_diff
+        run: |
+          git fetch origin main
+          git diff origin/main -- perms_list.json > diff.txt
+          DIFF_CONTENT=$(cat diff.txt | head -c 1900)
+          echo "$DIFF_CONTENT" > trimmed_diff.txt
       - name: Notify to Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
+          DIFF=$(cat trimmed_diff.txt)
+          PAYLOAD=$(jq -n --arg content "✅ perms_list.jsonが正常に更新されました\n🔗 https://asukabeehive.github.io/BeeHivePerms/perms_list.json" \
+                           --arg diff "```diff\n$DIFF\n```" \
+            '{
+              username: "GitHub Actions",
+              content: $content,
+              embeds: [
+                {
+                  title: "変更内容",
+                  description: $diff,
+                  color: 65280
+                }
+              ]
+            }')
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d '{
-              "username": "GitHub Actions",
-              "content": "✅ perms_list.jsonが正常に更新されました\n🔗 https://asukabeehive.github.io/BeeHivePerms/perms_list.json"
-            }' \
-            ${DISCORD_WEBHOOK_URL}
-        
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
