@@ -31,6 +31,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
@@ -44,10 +46,8 @@ jobs:
       - name: Get git diff
         id: git_diff
         run: |
-          git fetch origin main
-          git diff origin/main -- perms_list.json > diff.txt
-          DIFF_CONTENT=$(cat diff.txt | head -c 1900)
-          echo "$DIFF_CONTENT" > trimmed_diff.txt
+          git diff HEAD^ -- perms_list.json > diff.txt
+          cat diff.txt | head -c 1900 > trimmed_diff.txt
       - name: Notify to Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
