@@ -52,10 +52,14 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          DIFF=$(cat trimmed_diff.txt | head -c 1900 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-          jq -n \
-            --arg content "✅ perms_list.jsonが正常に更新されました\n🔗 https://asukabeehive.github.io/BeeHivePerms/perms_list.json" \
-            --arg diff "```diff\n$DIFF\n```" \
+          # diff 文字列の先頭と末尾に ```diff を追加してから埋め込む
+          echo '```diff' > formatted_diff.txt
+          cat trimmed_diff.txt >> formatted_diff.txt
+          echo '```' >> formatted_diff.txt
+
+          # jq に渡す（改行を安全に処理）
+          jq -Rs --arg content "✅ perms_list.jsonが正常に更新されました\n🔗 https://asukabeehive.github.io/BeeHivePerms/perms_list.json" \
+            --argfile diff formatted_diff.txt \
             '{
               username: "GitHub Actions",
               content: $content,
@@ -72,3 +76,4 @@ jobs:
                -X POST \
                -d @payload.json \
                "$DISCORD_WEBHOOK_URL"
+
