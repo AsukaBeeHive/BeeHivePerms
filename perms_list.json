@@ -41,7 +41,7 @@
   },
   {
     "name": "ShinoHiro4",
-    "role": "キャスト"
+    "role": "VIPキャスト"
   },
   {
     "name": "すふぇーん",
@@ -77,6 +77,10 @@
   },
   {
     "name": "sarasarari",
+    "role": "サポーター"
+  },
+  {
+    "name": "ミリカス",
     "role": "サポーター"
   }
 ]
