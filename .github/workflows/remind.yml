@@ -37,10 +37,17 @@ jobs:
           echo "perms_list.json最終更新日時: $(TZ='Asia/Tokyo' date -d @$LAST_COMMIT_TIMESTAMP '+%Y年%m月%d日 %H時%M分 (JST)')"
           echo "現在時刻: $(TZ='Asia/Tokyo' date -d @$CURRENT_TIMESTAMP '+%Y年%m月%d日 %H時%M分 (JST)')"
           echo "経過時間: ${ELAPSED_DAYS}日${ELAPSED_HOURS}時間${ELAPSED_MINUTES}分経過"
+
+          echo "elapsed_days=${ELAPSED_DAYS}" >> $GITHUB_OUTPUT
+          echo "elapsed_hours=${ELAPSED_HOURS}" >> $GITHUB_OUTPUT
+          echo "elapsed_minutes=${ELAPSED_MINUTES}" >> $GITHUB_OUTPUT
+          echo "last_update_jst=${LAST_UPDATE_JST}" >> $GITHUB_OUTPUT
+          echo "needs_notification=false" >> $GITHUB_OUTPUT
           
           if [ $ELAPSED_SECONDS -gt $ONE_WEEK_SECONDS ]; then
             echo "⚠️ 未コミットです"
             echo "perms_list.jsonが1週間以上更新されていません。"
+            echo "needs_notification=true" >> $GITHUB_OUTPUT
             
             # GitHubの通知機能を使用する場合（オプション）
             echo "::warning::perms_list.jsonが1週間以上更新されていません"
@@ -48,3 +55,45 @@ jobs:
             echo "✅ 最近更新されています"
             echo "perms_list.jsonは最後の更新から${ELAPSED_DAYS}日${ELAPSED_HOURS}時間${ELAPSED_MINUTES}分経過"
           fi
+      - name: Notify to Discord
+        if: steps.check.outputs.needs_notification == 'true'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          jq -n \
+            --arg content "⚠️ perms_list.jsonが1週間以上更新されていません！
+          📅 最終更新: ${{ steps.check.outputs.last_update_jst }} (JST)
+          ⏰ 経過時間: ${{ steps.check.outputs.elapsed_days }}日${{ steps.check.outputs.elapsed_hours }}時間${{ steps.check.outputs.elapsed_minutes }}分
+          🔗 https://github.com/${{ github.repository }}/blob/main/perms_list.json" \
+            '{
+              username: "GitHub Actions",
+              content: $content,
+              embeds: [
+                {
+                  title: "🚨 perms_list.json 更新リマインダー",
+                  description: "前回の更新から１週間が経過しています。１日キャストの更新を確認してください。すでに更新済みの場合は無視してかまいません。",
+                  color: 16776960,
+                  fields: [
+                    {
+                      name: "📅 最終更新",
+                      value: "${{ steps.check.outputs.last_update_jst }} (JST)",
+                      inline: true
+                    },
+                    {
+                      name: "⏱️ 経過時間",
+                      value: "${{ steps.check.outputs.elapsed_days }}日${{ steps.check.outputs.elapsed_hours }}時間${{ steps.check.outputs.elapsed_minutes }}分",
+                      inline: true
+                    }
+                  ],
+                  footer: {
+                    text: "BeeHive Perms Reminder"
+                  },
+                  timestamp: "'$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'"
+                }
+              ]
+            }' > payload.json
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d @payload.json \
+               "$DISCORD_WEBHOOK_URL"
