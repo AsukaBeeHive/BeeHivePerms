@@ -53,6 +53,7 @@ jobs:
             echo "perms_list.jsonは最後の更新から${ELAPSED_DAYS}日${ELAPSED_HOURS}時間${ELAPSED_MINUTES}分経過"
             echo "needs_notification=true" >> $GITHUB_OUTPUT
           fi
+          echo $GITHUB_OUTPUT
       - name: Notify to Discord
         if: steps.check.outputs.needs_notification == 'true'
         env:
