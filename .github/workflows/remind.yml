@@ -8,6 +8,8 @@ on:
 
 jobs:
   check:
+    environment:
+      name: reminder
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -55,7 +57,7 @@ jobs:
           fi
           echo $GITHUB_OUTPUT
       - name: Notify to Discord
-        if: steps.check.outputs.needs_notification == 'true'
+        
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
