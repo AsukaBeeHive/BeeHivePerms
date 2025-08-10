@@ -14,21 +14,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check last commit date
         run: |
-          LAST_COMMIT_TIMESTAMP=$(git log -1 --format="%ct")
+          if [ ! -f "perms_list.json" ]; then
+            echo "❌ perms_list.jsonファイルが見つかりません"
+            exit 1
+          fi
+          LAST_COMMIT_TIMESTAMP=$(git log -1 --format="%ct" -- perms_list.json)
+          if [ -z "$LAST_COMMIT_TIMESTAMP" ]; then
+            echo "❌ perms_list.jsonのコミット履歴が見つかりません"
+            exit 1
+          fi
           CURRENT_TIMESTAMP=$(date +%s)
           ONE_WEEK_SECONDS=$((7 * 24 * 60 * 60))
           ELAPSED_SECONDS=$((CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP))
           
-          echo "最新コミット日時: $(date -d @$LAST_COMMIT_TIMESTAMP)"
+          echo "perms_list.json最終更新日時: $(date -d @$LAST_COMMIT_TIMESTAMP)"
           echo "現在時刻: $(date -d @$CURRENT_TIMESTAMP)"
           echo "経過時間: $((ELAPSED_SECONDS / 86400))日"
           
           if [ $ELAPSED_SECONDS -gt $ONE_WEEK_SECONDS ]; then
             echo "⚠️ 未コミットです"
-            echo "最後のコミットから1週間以上経過しています。"
+            echo "perms_list.jsonが1週間以上更新されていません。"
             
-            echo "::warning::最後のコミットから1週間以上経過しています"
+            # GitHubの通知機能を使用する場合（オプション）
+            echo "::warning::perms_list.jsonが1週間以上更新されていません"
           else
-            echo "✅ 最近コミットされています"
-            echo "最後のコミットから$((ELAPSED_SECONDS / 86400))日経過"
+            echo "✅ 最近更新されています"
+            echo "perms_list.jsonは最後の更新から$((ELAPSED_SECONDS / 86400))日経過"
           fi
