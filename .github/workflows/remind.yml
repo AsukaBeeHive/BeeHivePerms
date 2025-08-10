@@ -30,7 +30,7 @@ jobs:
             exit 1
           fi
           CURRENT_TIMESTAMP=$(date +%s)
-          ONE_WEEK_SECONDS=$((7 * 24 * 60 * 60))
+          ONE_WEEK_SECONDS=$((5 * 24 * 60 * 60))
           ELAPSED_SECONDS=$((CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP))
 
           LAST_UPDATE_JST=$(TZ='Asia/Tokyo' date -d @$LAST_COMMIT_TIMESTAMP '+%Y年%m月%d日 %H時%M分')
