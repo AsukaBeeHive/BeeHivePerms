@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Check last commit date
         run: |
+          export TZ='Asia/Tokyo'
           if [ ! -f "perms_list.json" ]; then
             echo "❌ perms_list.jsonファイルが見つかりません"
             exit 1
