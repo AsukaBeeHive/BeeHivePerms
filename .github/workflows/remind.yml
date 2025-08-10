@@ -30,9 +30,13 @@ jobs:
           ONE_WEEK_SECONDS=$((7 * 24 * 60 * 60))
           ELAPSED_SECONDS=$((CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP))
           
-          echo "perms_list.json最終更新日時: $(date -d @$LAST_COMMIT_TIMESTAMP)"
-          echo "現在時刻: $(date -d @$CURRENT_TIMESTAMP)"
-          echo "経過時間: $((ELAPSED_SECONDS / 86400))日"
+          ELAPSED_DAYS=$((ELAPSED_SECONDS / 86400))
+          ELAPSED_HOURS=$(((ELAPSED_SECONDS % 86400) / 3600))
+          ELAPSED_MINUTES=$(((ELAPSED_SECONDS % 3600) / 60))
+          
+          echo "perms_list.json最終更新日時: $(TZ='Asia/Tokyo' date -d @$LAST_COMMIT_TIMESTAMP '+%Y年%m月%d日 %H時%M分 (JST)')"
+          echo "現在時刻: $(TZ='Asia/Tokyo' date -d @$CURRENT_TIMESTAMP '+%Y年%m月%d日 %H時%M分 (JST)')"
+          echo "経過時間: ${ELAPSED_DAYS}日${ELAPSED_HOURS}時間${ELAPSED_MINUTES}分経過"
           
           if [ $ELAPSED_SECONDS -gt $ONE_WEEK_SECONDS ]; then
             echo "⚠️ 未コミットです"
@@ -42,5 +46,5 @@ jobs:
             echo "::warning::perms_list.jsonが1週間以上更新されていません"
           else
             echo "✅ 最近更新されています"
-            echo "perms_list.jsonは最後の更新から$((ELAPSED_SECONDS / 86400))日経過"
+            echo "perms_list.jsonは最後の更新から${ELAPSED_DAYS}日${ELAPSED_HOURS}時間${ELAPSED_MINUTES}分経過"
           fi
