@@ -52,11 +52,10 @@ jobs:
           if [ $ELAPSED_SECONDS -gt $ONE_WEEK_SECONDS ]; then
             echo "⚠️ 未コミットです"
             echo "perms_list.jsonが1週間以上更新されていません。"
-            # echo "needs_notification=true" >> $GITHUB_OUTPUT
+            echo "needs_notification=true" >> $GITHUB_OUTPUT
           else
             echo "✅ 最近更新されています"
             echo "perms_list.jsonは最後の更新から${ELAPSED_DAYS}日${ELAPSED_HOURS}時間${ELAPSED_MINUTES}分経過"
-            echo "needs_notification=true" >> $GITHUB_OUTPUT
           fi
           echo $GITHUB_OUTPUT
       - name: Notify to Discord
