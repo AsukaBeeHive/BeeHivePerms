@@ -17,6 +17,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Check last commit date
+        id: check
         run: |
           export TZ='Asia/Tokyo'
           if [ ! -f "perms_list.json" ]; then
@@ -31,6 +32,8 @@ jobs:
           CURRENT_TIMESTAMP=$(date +%s)
           ONE_WEEK_SECONDS=$((7 * 24 * 60 * 60))
           ELAPSED_SECONDS=$((CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP))
+
+          LAST_UPDATE_JST=$(TZ='Asia/Tokyo' date -d @$LAST_COMMIT_TIMESTAMP '+%Y年%m月%d日 %H時%M分')
           
           ELAPSED_DAYS=$((ELAPSED_SECONDS / 86400))
           ELAPSED_HOURS=$(((ELAPSED_SECONDS % 86400) / 3600))
@@ -57,7 +60,7 @@ jobs:
           fi
           echo $GITHUB_OUTPUT
       - name: Notify to Discord
-        
+        if: steps.check.outputs.needs_notification == 'true'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
