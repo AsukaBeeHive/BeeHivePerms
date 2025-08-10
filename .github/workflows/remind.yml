@@ -65,10 +65,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           jq -n \
-            --arg content "⚠️ perms_list.jsonが1週間以上更新されていません！
-          📅 最終更新: ${{ steps.check.outputs.last_update_jst }} (JST)
-          ⏰ 経過時間: ${{ steps.check.outputs.elapsed_days }}日${{ steps.check.outputs.elapsed_hours }}時間${{ steps.check.outputs.elapsed_minutes }}分
-          🔗 https://github.com/${{ github.repository }}/blob/main/perms_list.json" \
+            --arg content "⚠️ perms_list.jsonが1週間以上更新されていません！ \
             '{
               username: "GitHub Actions",
               content: $content,
