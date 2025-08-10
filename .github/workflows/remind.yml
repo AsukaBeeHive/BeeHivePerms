@@ -51,7 +51,7 @@ jobs:
           
           if [ $ELAPSED_SECONDS -gt $ONE_WEEK_SECONDS ]; then
             echo "⚠️ 未コミットです"
-            echo "perms_list.jsonが1週間以上更新されていません。"
+            echo "perms_list.jsonが5日間以上更新されていません。"
             echo "needs_notification=true" >> $GITHUB_OUTPUT
           else
             echo "✅ 最近更新されています"
