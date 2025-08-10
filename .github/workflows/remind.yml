@@ -1,0 +1,34 @@
+name: Reminder
+
+on:
+  schedule:
+    - cron: '0 12 * * 4'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@v4
+      - name: Check last commit date
+        run: |
+          LAST_COMMIT_TIMESTAMP=$(git log -1 --format="%ct")
+          CURRENT_TIMESTAMP=$(date +%s)
+          ONE_WEEK_SECONDS=$((7 * 24 * 60 * 60))
+          ELAPSED_SECONDS=$((CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP))
+          
+          echo "最新コミット日時: $(date -d @$LAST_COMMIT_TIMESTAMP)"
+          echo "現在時刻: $(date -d @$CURRENT_TIMESTAMP)"
+          echo "経過時間: $((ELAPSED_SECONDS / 86400))日"
+          
+          if [ $ELAPSED_SECONDS -gt $ONE_WEEK_SECONDS ]; then
+            echo "⚠️ 未コミットです"
+            echo "最後のコミットから1週間以上経過しています。"
+            
+            echo "::warning::最後のコミットから1週間以上経過しています"
+          else
+            echo "✅ 最近コミットされています"
+            echo "最後のコミットから$((ELAPSED_SECONDS / 86400))日経過"
+          fi
