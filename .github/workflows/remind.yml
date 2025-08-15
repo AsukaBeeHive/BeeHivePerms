@@ -62,6 +62,7 @@ jobs:
         if: steps.check.outputs.needs_notification == 'true'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_MENTION_ID: ${{ secrets.DISCORD_MENTION_ID }}
         run: |
           jq -n \
             --arg content "<@!${DISCORD_MENTION_ID}>
